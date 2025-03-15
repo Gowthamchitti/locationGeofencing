@@ -1,4 +1,4 @@
-package com.example.app;
+package com.example.GeoNotifyApp;
 
 import com.getcapacitor.BridgeActivity;
 
