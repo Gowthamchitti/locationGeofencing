@@ -1,0 +1,6 @@
+{
+  "appId": "com.example.locationnotifier",
+  "appName": "LocationNotifier",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

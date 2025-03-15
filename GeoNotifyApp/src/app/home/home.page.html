@@ -1,0 +1,33 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>📍 Current Location</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p *ngIf="currentLocation"> 
+      🌎 {{ currentLocation.placeName || 'Fetching place name...' }}
+    </p>
+    <p *ngIf="!currentLocation">Fetching location...</p>
+  </ion-card-content>
+</ion-card>
+
+<ion-item>
+  <ion-label position="stacked">Enter Destination</ion-label>
+  <ion-input [(ngModel)]="searchQuery" (ionInput)="fetchLocationSuggestions()" placeholder="Search for a place"></ion-input>
+</ion-item>
+
+<ion-list *ngIf="locationSuggestions.length > 0">
+  <ion-item *ngFor="let suggestion of locationSuggestions" (click)="selectDestination(suggestion)">
+    {{ suggestion }}
+  </ion-item>
+</ion-list>
+
+<ion-card *ngIf="destinationLocation">
+  <ion-card-header>
+    <ion-card-title>📍 Destination Selected</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    🌎 {{ destinationLocation.placeName }}
+  </ion-card-content>
+</ion-card>
+
+<ion-button expand="full" (click)="startMonitoring()">Start Monitoring</ion-button>
