@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { LocalNotifications } from '@capacitor/local-notifications';
-
-
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 declare var google: any;
 
 @Component({
@@ -21,10 +20,29 @@ export class HomePage implements OnInit, AfterViewInit {
    // Radius selection
    radiusOptions = [100, 250, 500,750, 1000, 2000]; // In meters
    selectedRadius = 500; // Default radius
+   resetData =false;
+   intervalId: any; // Declare a variable to store the interval ID
   constructor() {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.requestPermissions();
     this.getCurrentLocation();
+  }
+
+  
+  async requestPermissions() {
+    try {
+      // Request location permissions
+      const locPermission = await Geolocation.requestPermissions();
+      console.log('Location Permission:', locPermission);
+
+      // Request notification permissions (Android 13+)
+      const notifPermission = await LocalNotifications.requestPermissions();
+      console.log('Notification Permission:', notifPermission);
+    } catch (error) {
+      console.error('Permission request error:', error);
+      alert("Please grant permission")
+    }
   }
 
   ngAfterViewInit() {
@@ -45,6 +63,11 @@ export class HomePage implements OnInit, AfterViewInit {
     }
   }
 
+  async triggerVibration() {
+    console.log("Virabtion enabled")
+    await Haptics.impact({ style: ImpactStyle.Medium });
+  }
+
   loadMap() {
     if (!this.mapElement) return;
 
@@ -52,6 +75,7 @@ export class HomePage implements OnInit, AfterViewInit {
       center: this.currentLocation || { lat: 20.5937, lng: 78.9629 }, // Default India
       zoom: 15
     });
+  // google.Maps.setPadding(0, 100, 0, 0);
 
     // Place marker at current location
     if (this.currentLocation) {
@@ -110,7 +134,7 @@ export class HomePage implements OnInit, AfterViewInit {
     }
     alert('Started monitoring...');
 
-    setInterval(async () => {
+    this.intervalId=setInterval(async () => {
       const position = await Geolocation.getCurrentPosition();
       this.currentLocation = {
         lat: position.coords.latitude,
@@ -127,6 +151,8 @@ export class HomePage implements OnInit, AfterViewInit {
 
       if (distance < this.selectedRadius/1000 && !this.notificationSent) { // Notify when within 500 meters
         this.sendNotification();
+        this.triggerVibration();
+        clearInterval(this.intervalId)
         this.notificationSent = true; // Prevent duplicate notifications
       }
     }, 5000); // Check every 5 seconds
@@ -158,9 +184,15 @@ export class HomePage implements OnInit, AfterViewInit {
       ],
     });
   }
+  refresh(){
+    this.getCurrentLocation();
+  }
+
   reset(){
     this.destinationLocation=null
     this.notificationSent=false
+    clearInterval(this.intervalId)
+
     if(this.destinationMarker){
       this.destinationMarker.setMap(null);
       this.destinationMarker=null;

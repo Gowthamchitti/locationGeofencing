@@ -1,10 +1,12 @@
+<ion-content  class="safe-area">
 <ion-header>
   <ion-toolbar>
     <ion-title>Location Tracker</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<div style="margin-top: 10%; margin-bottom:10%; display:flex; flex-direction:column; overflow: scroll">
+<div style="margin-bottom:10%; display:flex; flex-direction:column; overflow: scroll;">
+  <ion-button expand="full" (click)="refresh()">Refresh</ion-button>
   <ion-card>
     <ion-card-header>
       <ion-card-title>📍 Current Location</ion-card-title>
@@ -42,3 +44,4 @@
  
 
 </div>
+</ion-content>
