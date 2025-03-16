@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { Geolocation } from '@capacitor/geolocation';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 declare var google: any;
 
 @Component({
@@ -12,21 +13,26 @@ declare var google: any;
 })
 export class HomePage implements OnInit, AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapElement!: ElementRef;
+  
   map!: any;
   currentLocation: { lat: number; lng: number; placeName?: string } | null = null;
   destinationLocation: { lat: number; lng: number; placeName?: string } | null = null;
   notificationSent = false; // Flag to prevent duplicate notifications
   destinationMarker: any = null; // Store the single destination marker
    // Radius selection
-   radiusOptions = [100, 250, 500,750, 1000, 2000]; // In meters
+   radiusOptions = [50, 100, 250, 500,750, 1000, 2000]; // In meters
    selectedRadius = 500; // Default radius
    resetData =false;
    intervalId: any; // Declare a variable to store the interval ID
+  marker: any;
   constructor() {}
 
   async ngOnInit() {
+
     await this.requestPermissions();
     this.getCurrentLocation();
+    this.triggerVibration();
+    this.sendNotification() //jhg
   }
 
   
@@ -64,8 +70,13 @@ export class HomePage implements OnInit, AfterViewInit {
   }
 
   async triggerVibration() {
-    console.log("Virabtion enabled")
+    navigator.vibrate(1000);
+
     await Haptics.impact({ style: ImpactStyle.Medium });
+    if ('vibrate' in navigator) {
+      console.log("Virabtion enabled")
+      navigator.vibrate([300, 100, 300]); // Vibrate pattern
+    }
   }
 
   loadMap() {
@@ -76,7 +87,7 @@ export class HomePage implements OnInit, AfterViewInit {
       zoom: 15
     });
   // google.Maps.setPadding(0, 100, 0, 0);
-
+  
     // Place marker at current location
     if (this.currentLocation) {
       new google.maps.Marker({
@@ -151,7 +162,6 @@ export class HomePage implements OnInit, AfterViewInit {
 
       if (distance < this.selectedRadius/1000 && !this.notificationSent) { // Notify when within 500 meters
         this.sendNotification();
-        this.triggerVibration();
         clearInterval(this.intervalId)
         this.notificationSent = true; // Prevent duplicate notifications
       }
@@ -180,9 +190,12 @@ export class HomePage implements OnInit, AfterViewInit {
           body: `You are near ${this.destinationLocation?.placeName}`,
           id: 1,
           schedule: { at: new Date(Date.now() + 1000) },
+          sound:'default',
+          smallIcon:'ic_launcher',
         },
       ],
     });
+    this.triggerVibration();
   }
   refresh(){
     this.getCurrentLocation();
@@ -197,5 +210,16 @@ export class HomePage implements OnInit, AfterViewInit {
       this.destinationMarker.setMap(null);
       this.destinationMarker=null;
     }
+  }
+  async recenterMap() {
+    const coordinates = await Geolocation.getCurrentPosition();
+
+    const position = {
+      lat: coordinates.coords.latitude,
+      lng: coordinates.coords.longitude,
+    };
+
+    this.map.setCenter(position);
+    this.marker.setPosition(position);
   }
 }

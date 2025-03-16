@@ -1,13 +1,22 @@
-<ion-content  class="safe-area">
+<ion-content  class="safe-area" >
+  <div style="margin-top: 10%;overflow-y:scroll">
 <ion-header>
   <ion-toolbar>
     <ion-title>Location Tracker</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<div style="margin-bottom:10%; display:flex; flex-direction:column; overflow: scroll;">
-  <ion-button expand="full" (click)="refresh()">Refresh</ion-button>
-  <ion-card>
+  
+<ion-button expand="full" (click)="refresh()">Refresh</ion-button>
+<ion-card>
+<ion-item>
+  <ion-label>Radius</ion-label>
+  <ion-select [(ngModel)]="selectedRadius">
+    <ion-select-option *ngFor="let r of radiusOptions" [value]="r">{{ r }} m</ion-select-option>
+  </ion-select>
+</ion-item>
+</ion-card>
+<ion-card>
     <ion-card-header>
       <ion-card-title>📍 Current Location</ion-card-title>
     </ion-card-header>
@@ -32,16 +41,13 @@
     </ion-card-content>
   </ion-card>
 <div style="display: flex;flex-direction:row">
-  <ion-item>
-    <ion-label>Radius</ion-label>
-    <ion-select [(ngModel)]="selectedRadius">
-      <ion-select-option *ngFor="let r of radiusOptions" [value]="r">{{ r }} m</ion-select-option>
-    </ion-select>
-  </ion-item>
   <ion-button expand="full" (click)="startMonitoring()">Start Monitoring</ion-button>
   <ion-button expand="full" (click)="reset()">Reset</ion-button>
-</div>
- 
+  <ion-button (click)="recenterMap()">
+    🔄 Recenter
+  </ion-button>
+  <button (click)="triggerVibration()">Test Vibration</button>
 
+</div>
 </div>
 </ion-content>
