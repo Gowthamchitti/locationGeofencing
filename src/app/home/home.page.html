@@ -1,33 +1,44 @@
-<ion-card>
-  <ion-card-header>
-    <ion-card-title>📍 Current Location</ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <p *ngIf="currentLocation"> 
-      🌎 {{ currentLocation.placeName || 'Fetching place name...' }}
-    </p>
-    <p *ngIf="!currentLocation">Fetching location...</p>
-  </ion-card-content>
-</ion-card>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Location Tracker</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-<ion-item>
-  <ion-label position="stacked">Enter Destination</ion-label>
-  <ion-input [(ngModel)]="searchQuery" (ionInput)="fetchLocationSuggestions()" placeholder="Search for a place"></ion-input>
-</ion-item>
+<div style="margin-top: 10%; margin-bottom:10%; display:flex; flex-direction:column; overflow: scroll">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>📍 Current Location</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p *ngIf="currentLocation"> 
+        🌎 {{ currentLocation.placeName || 'Fetching place name...' }}
+      </p>
+      <p *ngIf="!currentLocation">Fetching location...</p>
+    </ion-card-content>
+  </ion-card>
 
-<ion-list *ngIf="locationSuggestions.length > 0">
-  <ion-item *ngFor="let suggestion of locationSuggestions" (click)="selectDestination(suggestion)">
-    {{ suggestion }}
+  <!-- Google Maps Container -->
+   <div style="padding: 1px 1px;">
+  <div #mapContainer id="map" style="width: 100%; height: 400px;"></div>
+</div>
+  <ion-card *ngIf="destinationLocation">
+    <ion-card-header>
+      <ion-card-title>📍 Destination Selected</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      🌎 {{ destinationLocation.placeName }}
+    </ion-card-content>
+  </ion-card>
+<div style="display: flex;flex-direction:row">
+  <ion-item>
+    <ion-label>Radius</ion-label>
+    <ion-select [(ngModel)]="selectedRadius">
+      <ion-select-option *ngFor="let r of radiusOptions" [value]="r">{{ r }} m</ion-select-option>
+    </ion-select>
   </ion-item>
-</ion-list>
+  <ion-button expand="full" (click)="startMonitoring()">Start Monitoring</ion-button>
+  <ion-button expand="full" (click)="reset()">Reset</ion-button>
+</div>
+ 
 
-<ion-card *ngIf="destinationLocation">
-  <ion-card-header>
-    <ion-card-title>📍 Destination Selected</ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    🌎 {{ destinationLocation.placeName }}
-  </ion-card-content>
-</ion-card>
-
-<ion-button expand="full" (click)="startMonitoring()">Start Monitoring</ion-button>
+</div>
